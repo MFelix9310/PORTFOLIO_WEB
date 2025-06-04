@@ -1,0 +1,661 @@
+{% extends 'portfolio/base.html' %}
+
+{% block extra_css %}
+<style>
+    .education-description, .certification-description {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        margin-top: 0;
+        border-top: 1px solid #eee;
+    }
+    
+    .education-description.active, .certification-description.active {
+        max-height: 500px; /* Altura máxima arbitraria para la animación */
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .description-toggle.active {
+        background-color: #e67e22;
+    }
+    
+    .education-card, .certification-card, .project-card, .work-card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* Estilo de las cabeceras naranjas */
+    .certification-card-header, .project-card-header, .work-card-header {
+        background-color: #ff7a00;
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .certification-card-body, .project-card-body, .work-card-body {
+        padding: 1.5rem;
+    }
+    
+    .hero-social-icons {
+        margin-top: 20px;
+    }
+    
+    .hero-social-icons a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        margin-right: 15px;
+        border-radius: 50%;
+        background-color: #e67e22;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .hero-social-icons a:hover {
+        background-color: #d35400;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .hero-social-icon {
+        width: 25px;
+        height: 25px;
+        transition: all 0.3s ease;
+    }
+    
+    .bio-container {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        opacity: 0;
+        margin-bottom: 0;
+    }
+    
+    .bio-container.active {
+        max-height: 500px; /* Altura máxima arbitraria para la animación */
+        opacity: 1;
+        margin-bottom: 1rem;
+    }
+    
+    .about-me-btn.active {
+        background-color: #d35400;
+    }
+    
+    /* Estilos para la sección de experiencia laboral */
+    .work-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        border: none;
+    }
+    
+    .work-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .work-img-container {
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+        background-color: #f8f9fa;
+    }
+    
+    .work-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+    }
+    
+    .work-card:hover .work-img {
+        transform: scale(1.05);
+    }
+    
+    .company-logo {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        border-radius: 6px;
+        background-color: #f8f9fa;
+        padding: 3px;
+    }
+    
+    .position-title {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .work-dates {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .work-dates i {
+        color: #e67e22;
+        margin-right: 6px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+                <div class="hero-img-container" data-aos="fade-left">
+                    {% if profile.photo %}
+                        <img src="{{ profile.photo.url }}" alt="{{ profile.name }}" class="hero-img">
+                    {% else %}
+                        <img src="/static/images/placeholder-profile.jpg" alt="Profile Placeholder" class="hero-img">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+                <div class="hero-content" data-aos="fade-right">
+                    <h1>
+                        {% if profile %}
+                            {% if LANGUAGE_CODE == 'en' and profile.name_en %}
+                                {{ profile.name_en }}
+                            {% else %}
+                                {{ profile.name }}
+                            {% endif %}
+                        {% else %}
+                            Felix Ruiz M.
+                        {% endif %}
+                    </h1>
+                    <p class="subtitle">
+                        {% if profile %}
+                            {% if LANGUAGE_CODE == 'en' and profile.title_en %}
+                                {{ profile.title_en }}
+                            {% else %}
+                                {{ profile.title }}
+                            {% endif %}
+                        {% else %}
+                            {% if LANGUAGE_CODE == 'en' %}Python Developer & Data Scientist{% else %}Desarrollador Python & Data Scientist{% endif %}
+                        {% endif %}
+                    </p>
+                    
+                    <div id="bioContainer" class="bio-container">
+                        <p>
+                            {% if profile %}
+                                {% if LANGUAGE_CODE == 'en' and profile.bio_en %}
+                                    {{ profile.bio_en }}
+                                {% else %}
+                                    {{ profile.bio }}
+                                {% endif %}
+                            {% else %}
+                                {% if LANGUAGE_CODE == 'en' %}Python Developer and Data Scientist with extensive experience in data analysis, machine learning, and web development projects. Passionate about technology and solving complex problems using industry best practices.{% else %}Desarrollador Python y Data Scientist con amplia experiencia en proyectos de análisis de datos, machine learning y desarrollo web. Apasionado por la tecnología y la resolución de problemas complejos utilizando las mejores prácticas de la industria.{% endif %}
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button id="aboutMeBtn" class="btn btn-orange about-me-btn me-3">
+                            {% if LANGUAGE_CODE == 'en' %}About Me{% else %}Acerca de Mí{% endif %}
+                        </button>
+                        <a href="{% url 'portfolio:project_list' %}" class="btn btn-orange me-3">{% if LANGUAGE_CODE == 'en' %}View Projects{% else %}Ver Proyectos{% endif %}</a>
+                        <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-dark">{% if LANGUAGE_CODE == 'en' %}Contact Me{% else %}Contactar{% endif %}</a>
+                    </div>
+                    
+                    <!-- Social Icons -->
+                    <div class="hero-social-icons">
+                        {% with has_icons=False %}
+                            {% for contact in contact_list %}
+                                {% if contact.type == 'linkedin' and contact.is_active %}
+                                    <a href="{{ contact.value }}" target="_blank" title="LinkedIn">
+                                        <img src="/static/images/social/linkedin.svg" alt="LinkedIn" class="hero-social-icon">
+                                    </a>
+                                    {% with has_icons=True %}{% endwith %}
+                                {% endif %}
+                                {% if contact.type == 'github' and contact.is_active %}
+                                    <a href="{{ contact.value }}" target="_blank" title="GitHub">
+                                        <img src="/static/images/social/github.svg" alt="GitHub" class="hero-social-icon">
+                                    </a>
+                                    {% with has_icons=True %}{% endwith %}
+                                {% endif %}
+                                {% if contact.type == 'instagram' and contact.is_active %}
+                                    <a href="{{ contact.value }}" target="_blank" title="Instagram">
+                                        <img src="/static/images/social/instagram.svg" alt="Instagram" class="hero-social-icon">
+                                    </a>
+                                    {% with has_icons=True %}{% endwith %}
+                                {% endif %}
+                                {% if contact.type == 'tiktok' and contact.is_active %}
+                                    <a href="{{ contact.value }}" target="_blank" title="TikTok">
+                                        <img src="/static/images/social/tiktok.svg" alt="TikTok" class="hero-social-icon">
+                                    </a>
+                                    {% with has_icons=True %}{% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Education Section -->
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Education{% else %}Educación{% endif %}</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% if education_list %}
+                {% for education in education_list|slice:":3" %}
+                    {% if forloop.counter0 == 0 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    {% elif forloop.counter0 == 1 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    {% elif forloop.counter0 == 2 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    {% else %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up">
+                    {% endif %}
+                        <div class="education-card h-100">
+                            <div class="education-card-header">
+                                <h4>
+                                    {% if LANGUAGE_CODE == 'en' and education.title_en %}
+                                        {{ education.title_en }}
+                                    {% else %}
+                                        {{ education.title }}
+                                    {% endif %}
+                                </h4>
+                                <p class="mb-0">
+                                    {% if LANGUAGE_CODE == 'en' and education.institution_en %}
+                                        {{ education.institution_en }}
+                                    {% else %}
+                                        {{ education.institution }}
+                                    {% endif %}
+                                </p>
+                                <span class="education-year">{{ education.graduation_year }}</span>
+                            </div>
+                            <div class="education-card-body">
+                                <button class="btn btn-sm btn-orange description-toggle mb-2" data-target="home-education-description-{{ education.id }}">
+                                    {% if LANGUAGE_CODE == 'en' %}Description{% else %}Descripción{% endif %}
+                                </button>
+                                
+                                <div id="home-education-description-{{ education.id }}" class="education-description">
+                                    <p>
+                                        {% if LANGUAGE_CODE == 'en' and education.description_en %}
+                                            {{ education.description_en }}
+                                        {% else %}
+                                            {{ education.description }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if education_list.count > 3 %}
+                    <div class="col-12 text-center mt-4">
+                        <a href="{% url 'portfolio:education_list' %}" class="btn btn-outline-dark">{% if LANGUAGE_CODE == 'en' %}View All{% else %}Ver todas{% endif %}</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">{% if LANGUAGE_CODE == 'en' %}No education information available.{% else %}No hay información de educación disponible.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Certifications Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Certifications{% else %}Certificaciones{% endif %}</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% if certification_list %}
+                {% for certification in certification_list|slice:":3" %}
+                    {% if forloop.counter0 == 0 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    {% elif forloop.counter0 == 1 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    {% elif forloop.counter0 == 2 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    {% else %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up">
+                    {% endif %}
+                        <div class="certification-card h-100">
+                            <div class="certification-card-header">
+                                <h4>
+                                    {% if LANGUAGE_CODE == 'en' and certification.name_en %}
+                                        {{ certification.name_en }}
+                                    {% else %}
+                                        {{ certification.name }}
+                                    {% endif %}
+                                </h4>
+                                <p class="mb-0">
+                                    {% if LANGUAGE_CODE == 'en' and certification.institution_en %}
+                                        {{ certification.institution_en }}
+                                    {% else %}
+                                        {{ certification.institution }}
+                                    {% endif %}
+                                </p>
+                                <span class="certification-date">{{ certification.date_obtained|date:"F Y" }}</span>
+                            </div>
+                            <div class="certification-card-body">
+                                <button class="btn btn-sm btn-orange description-toggle mb-2" data-target="home-certification-description-{{ certification.id }}">
+                                    {% if LANGUAGE_CODE == 'en' %}Description{% else %}Descripción{% endif %}
+                                </button>
+                                
+                                {% if certification.certificate_file %}
+                                    <a href="{{ certification.certificate_file.url }}" class="btn btn-sm btn-outline-secondary mb-2 ms-2" target="_blank">
+                                        {% if LANGUAGE_CODE == 'en' %}View Certificate{% else %}Ver Certificado{% endif %}
+                                    </a>
+                                {% endif %}
+                                
+                                <div id="home-certification-description-{{ certification.id }}" class="certification-description">
+                                    <p>
+                                        {% if LANGUAGE_CODE == 'en' and certification.description_en %}
+                                            {{ certification.description_en }}
+                                        {% else %}
+                                            {{ certification.description }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if certification_list.count > 3 %}
+                    <div class="col-12 text-center mt-4">
+                        <a href="{% url 'portfolio:certification_list' %}" class="btn btn-outline-dark">{% if LANGUAGE_CODE == 'en' %}View All{% else %}Ver todas{% endif %}</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">{% if LANGUAGE_CODE == 'en' %}No certifications available.{% else %}No hay certificaciones disponibles.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Projects{% else %}Proyectos{% endif %}</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% if project_list %}
+                {% for project in project_list|slice:":3" %}
+                    {% if forloop.counter0 == 0 %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    {% elif forloop.counter0 == 1 %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    {% elif forloop.counter0 == 2 %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    {% else %}
+                    <div class="col-md-4" data-aos="fade-up">
+                    {% endif %}
+                        <div class="project-card h-100">
+                            <div class="project-card-header">
+                                <h4>
+                                    {% if LANGUAGE_CODE == 'en' and project.title_en %}
+                                        {{ project.title_en }}
+                                    {% else %}
+                                        {{ project.title }}
+                                    {% endif %}
+                                </h4>
+                                <p class="mb-0">
+                                    {% if LANGUAGE_CODE == 'en' and project.technologies_en %}
+                                        {{ project.technologies_en }}
+                                    {% else %}
+                                        {{ project.technologies }}
+                                    {% endif %}
+                                </p>
+                                
+                                {% if project.type == 'work' %}
+                                    <p class="mb-1">
+                                        {% if LANGUAGE_CODE == 'en' and project.company_en %}
+                                            <strong>{{ project.company_en }}</strong>
+                                        {% else %}
+                                            <strong>{{ project.company }}</strong>
+                                        {% endif %}
+                                    </p>
+                                    <p class="mb-1">
+                                        {{ project.start_date|date:"M Y" }} - 
+                                        {% if project.current_job %}
+                                            {% if LANGUAGE_CODE == 'en' %}Present{% else %}Actualidad{% endif %}
+                                {% else %}
+                                            {{ project.end_date|date:"M Y" }}
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="project-card-body">
+                                {% if project.thumbnail %}
+                                    <img src="{{ project.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and project.title_en %}{{ project.title_en }}{% else %}{{ project.title }}{% endif %}" class="img-fluid rounded mb-3">
+                                {% endif %}
+                                
+                                <p>
+                                    {% if LANGUAGE_CODE == 'en' and project.description_en %}
+                                        {{ project.description_en|truncatechars:100 }}
+                                    {% else %}
+                                        {{ project.description|truncatechars:100 }}
+                                    {% endif %}
+                                </p>
+                                <div class="d-flex flex-wrap mt-3">
+                                    {% if project.type == 'project' %}
+                                    {% if project.github_url %}
+                                            <a href="{{ project.github_url }}" target="_blank" class="btn btn-sm btn-orange me-2 mb-2">GitHub</a>
+                                    {% endif %}
+                                    {% if project.project_url %}
+                                            <a href="{{ project.project_url }}" target="_blank" class="btn btn-sm btn-orange me-2 mb-2">Demo</a>
+                                        {% endif %}
+                                    {% endif %}
+                                    <a href="{% url 'portfolio:project_detail' project.id %}" class="btn btn-sm btn-orange mb-2">{% if LANGUAGE_CODE == 'en' %}Details{% else %}Detalles{% endif %}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if project_list.count > 3 %}
+                    <div class="col-12 text-center mt-4">
+                        <a href="{% url 'portfolio:project_list' %}" class="btn btn-outline-dark">{% if LANGUAGE_CODE == 'en' %}View All{% else %}Ver todos{% endif %}</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">{% if LANGUAGE_CODE == 'en' %}No projects available.{% else %}No hay proyectos disponibles.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Work Experience Section -->
+<section id="work-experience" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">{% if LANGUAGE_CODE == 'en' %}Work Experience{% else %}Experiencia Laboral{% endif %}</h2>
+            <p class="section-subtitle">{% if LANGUAGE_CODE == 'en' %}My professional journey{% else %}Mi trayectoria profesional{% endif %}</p>
+        </div>
+        
+        <div class="row">
+            {% if work_list %}
+                {% for work in work_list %}
+                    {% if forloop.counter0 == 0 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    {% elif forloop.counter0 == 1 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    {% elif forloop.counter0 == 2 %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    {% else %}
+                    <div class="col-md-4 mb-4" data-aos="fade-up">
+                    {% endif %}
+                        <div class="work-card h-100">
+                            <div class="work-card-header">
+                                {% if work.company_logo %}
+                                <img src="{{ work.company_logo.url }}" alt="{{ work.company }}" class="me-2 company-logo" style="background-color: white; border-radius: 4px; padding: 3px; height: 30px; width: auto; margin-bottom: 10px;">
+                                {% endif %}
+                                <h4>
+                                    {% if LANGUAGE_CODE == 'en' and work.company_en %}
+                                        {{ work.company_en }}
+                                    {% else %}
+                                        {{ work.company }}
+                                    {% endif %}
+                                </h4>
+                                <h5 class="mb-2">
+                                    {% if LANGUAGE_CODE == 'en' and work.position_en %}
+                                        {{ work.position_en }}
+                                    {% else %}
+                                        {{ work.position }}
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-0">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ work.start_date|date:"F Y" }} - 
+                                    {% if work.current_job %}
+                                        {% if LANGUAGE_CODE == 'en' %}Present{% else %}Actualidad{% endif %}
+                                    {% else %}
+                                        {{ work.end_date|date:"F Y" }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="work-card-body">
+                                {% if work.thumbnail %}
+                                <img src="{{ work.thumbnail.url }}" class="img-fluid rounded mb-3" alt="{{ work.position }}">
+                                {% endif %}
+                                <p>
+                                    {% if LANGUAGE_CODE == 'en' and work.description_en %}
+                                        {{ work.description_en|truncatechars:150 }}
+                                    {% else %}
+                                        {{ work.description|truncatechars:150 }}
+                                    {% endif %}
+                                </p>
+                                <div class="text-end mt-3">
+                                    <a href="{% url 'portfolio:work_experience_detail' work.id %}" class="btn btn-sm btn-orange">
+                                        {% if LANGUAGE_CODE == 'en' %}Details{% else %}Detalles{% endif %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if work_list.count > 3 %}
+                    <div class="col-12 text-center mt-4">
+                        <a href="{% url 'portfolio:work_experience_list' %}" class="btn btn-outline-dark">{% if LANGUAGE_CODE == 'en' %}View All{% else %}Ver todos{% endif %}</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">{% if LANGUAGE_CODE == 'en' %}No work experience available.{% else %}No hay experiencia laboral disponible.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="section-title text-center" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Contact{% else %}Contacto{% endif %}</h2>
+                <p class="lead mb-5" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Do you have any questions or proposals? Don't hesitate to contact me!{% else %}¿Tienes alguna pregunta o propuesta? ¡No dudes en contactarme!{% endif %}</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8" data-aos="fade-up">
+                <div class="contact-info text-center">
+                    {% for contact in contact_list %}
+                        {% if contact.is_active %}
+                            <div class="contact-info-item d-inline-block mx-3">
+                                {% if contact.type == 'linkedin' %}
+                                    <a href="{{ contact.value }}" target="_blank" class="text-dark">
+                                        <i class="fab fa-linkedin fa-2x"></i>
+                                    </a>
+                                {% elif contact.type == 'github' %}
+                                    <a href="{{ contact.value }}" target="_blank" class="text-dark">
+                                        <i class="fab fa-github fa-2x"></i>
+                                    </a>
+                                {% elif contact.type == 'instagram' %}
+                                    <a href="{{ contact.value }}" target="_blank" class="text-dark">
+                                        <i class="fab fa-instagram fa-2x"></i>
+                                    </a>
+                                {% elif contact.type == 'tiktok' %}
+                                    <a href="{{ contact.value }}" target="_blank" class="text-dark">
+                                        <i class="fab fa-tiktok fa-2x"></i>
+                                    </a>
+                                {% elif contact.type == 'phone' %}
+                                    <a href="tel:{{ contact.value }}" class="text-dark">
+                                        <i class="fas fa-phone fa-2x"></i>
+                                    </a>
+                                {% elif contact.type == 'email' %}
+                                    <a href="mailto:{{ contact.value }}" class="text-dark">
+                                        <i class="fas fa-envelope fa-2x"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'portfolio:contact' %}" class="btn btn-orange">{% if LANGUAGE_CODE == 'en' %}Contact Now{% else %}Contactar ahora{% endif %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Funcionalidad para el botón "Acerca de mí"
+        const aboutMeBtn = document.getElementById('aboutMeBtn');
+        const bioContainer = document.getElementById('bioContainer');
+        
+        if (aboutMeBtn && bioContainer) {
+            aboutMeBtn.addEventListener('click', function() {
+                bioContainer.classList.toggle('active');
+                aboutMeBtn.classList.toggle('active');
+            });
+        }
+        
+        // Funcionalidad para botones de descripción
+        const descriptionToggles = document.querySelectorAll('.description-toggle');
+        
+        descriptionToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const descriptionElement = document.getElementById(targetId);
+                
+                // Alternar la clase active para la descripción
+                descriptionElement.classList.toggle('active');
+                
+                // Alternar la clase active para el botón
+                this.classList.toggle('active');
+            });
+        });
+    });
+</script>
+{% endblock %} 

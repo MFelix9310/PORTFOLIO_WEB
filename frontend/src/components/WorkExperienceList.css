@@ -1,0 +1,30 @@
+.work-item-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.work-item-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.work-item-exit {
+  opacity: 1;
+}
+
+.work-item-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Hover animation for work cards */
+.work-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.work-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+} 

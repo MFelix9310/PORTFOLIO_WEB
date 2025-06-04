@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones para Iconos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .instructions {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .icon-example {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #e67e22;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .icon {
+            width: 25px;
+            height: 25px;
+            filter: brightness(0) invert(1); /* Hace que el ícono sea blanco */
+        }
+        h1, h2 {
+            color: #e67e22;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Instrucciones para crear iconos de LinkedIn y GitHub</h1>
+    
+    <div class="instructions">
+        <h2>Paso 1: Preparar las imágenes</h2>
+        <p>Para que los iconos se vean correctamente en el diseño de tu portafolio, debes:</p>
+        <ol>
+            <li>Crear dos archivos de imagen: <code>linkedin-orange.png</code> y <code>github-orange.png</code></li>
+            <li>Cada imagen debe ser preferiblemente transparente (PNG) y de color blanco (o muy clara)</li>
+            <li>El tamaño recomendado es de 25px x 25px (se pueden hacer un poco más grandes si es necesario)</li>
+        </ol>
+        
+        <h2>Paso 2: Guardar en la ubicación correcta</h2>
+        <p>Guarda las imágenes en: <code>static/images/social/</code></p>
+        
+        <h2>Paso 3: Verificar el resultado</h2>
+        <p>Una vez guardadas las imágenes, reinicia el servidor Django y abre tu página principal para ver los iconos.</p>
+    </div>
+    
+    <h2>Ejemplo de cómo se verán los iconos:</h2>
+    
+    <div class="icon-example">
+        <div>
+            <div class="icon-box">
+                <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/linkedin.svg" alt="LinkedIn" class="icon">
+            </div>
+            <p>LinkedIn</p>
+        </div>
+        
+        <div>
+            <div class="icon-box">
+                <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/github.svg" alt="GitHub" class="icon">
+            </div>
+            <p>GitHub</p>
+        </div>
+    </div>
+    
+    <h2>Consejos para editar las imágenes:</h2>
+    <ul>
+        <li>Si utilizas herramientas como Photoshop o GIMP, asegúrate de que el fondo sea transparente</li>
+        <li>Si no tienes acceso a software de edición, puedes buscar iconos SVG en blanco de LinkedIn y GitHub y guardarlos como PNG</li>
+        <li>Una opción fácil es usar la biblioteca de iconos Simple Icons, que tiene todos los logos corporativos en formato SVG: <a href="https://simpleicons.org/" target="_blank">https://simpleicons.org/</a></li>
+    </ul>
+</body>
+</html> 

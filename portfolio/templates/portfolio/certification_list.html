@@ -1,0 +1,154 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Certifications{% else %}Certificaciones{% endif %} - Felix Ruiz M.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .certificate-description {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        margin-top: 0;
+        border-top: 1px solid #eee;
+    }
+    
+    .certificate-description.active {
+        max-height: 500px; /* Altura máxima arbitraria para la animación */
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .description-toggle.active {
+        background-color: #e67e22;
+    }
+    
+    .certification-card {
+        transition: all 0.3s ease;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Certifications Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Certifications{% else %}Certificaciones{% endif %}</h1>
+                <p class="lead" data-aos="fade-up" data-aos-delay="100">{% if LANGUAGE_CODE == 'en' %}My professional credentials and certificates{% else %}Mis credenciales y certificados profesionales{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Certifications List -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            {% if certification_list %}
+                {% for certification in certification_list %}
+                    {% if forloop.counter0 == 0 %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    {% elif forloop.counter0 == 1 %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    {% elif forloop.counter0 == 2 %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    {% elif forloop.counter0 == 3 %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    {% elif forloop.counter0 == 4 %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+                    {% elif forloop.counter0 == 5 %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="600">
+                    {% else %}
+                    <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
+                    {% endif %}
+                        <div class="certification-card h-100">
+                            <div class="certification-card-header">
+                                <h4>
+                                    {% if LANGUAGE_CODE == 'en' and certification.name_en %}
+                                        {{ certification.name_en }}
+                                    {% else %}
+                                        {{ certification.name }}
+                                    {% endif %}
+                                </h4>
+                                <p class="mb-0">
+                                    {% if LANGUAGE_CODE == 'en' and certification.institution_en %}
+                                        {{ certification.institution_en }}
+                                    {% else %}
+                                        {{ certification.institution }}
+                                    {% endif %}
+                                </p>
+                                <span class="certification-date">{{ certification.date_obtained|date:"F Y" }}</span>
+                            </div>
+                            
+                            <div class="certification-card-body">
+                                <button class="btn btn-sm btn-orange description-toggle mb-2" data-target="description-{{ certification.id }}">
+                                    {% if LANGUAGE_CODE == 'en' %}Description{% else %}Descripción{% endif %}
+                                </button>
+                                
+                                {% if certification.certificate_file %}
+                                    <a href="{{ certification.certificate_file.url }}" class="btn btn-sm btn-outline-secondary mb-2 ms-2" target="_blank">
+                                        {% if LANGUAGE_CODE == 'en' %}View Certificate{% else %}Ver Certificado{% endif %}
+                                    </a>
+                                {% endif %}
+                                
+                                {% if certification.credential_url %}
+                                    <a href="{{ certification.credential_url }}" class="btn btn-sm btn-orange mb-2 ms-2" target="_blank">
+                                        {% if LANGUAGE_CODE == 'en' %}Verify Credential{% else %}Verificar Credencial{% endif %}
+                                    </a>
+                                {% endif %}
+                                
+                                <div id="description-{{ certification.id }}" class="certificate-description">
+                                    <p>
+                                        {% if LANGUAGE_CODE == 'en' and certification.description_en %}
+                                            {{ certification.description_en }}
+                                        {% else %}
+                                            {{ certification.description }}
+                                        {% endif %}
+                                    </p>
+                                    
+                                    {% if certification.expiry_date %}
+                                        <p class="mt-2 small text-muted">
+                                            {% if LANGUAGE_CODE == 'en' %}Expires{% else %}Expira{% endif %}: {{ certification.expiry_date|date:"d/m/Y" }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>{% if LANGUAGE_CODE == 'en' %}No certifications available.{% else %}No hay certificaciones disponibles.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar evento de clic a todos los botones de descripción
+        const descriptionToggles = document.querySelectorAll('.description-toggle');
+        
+        descriptionToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const descriptionElement = document.getElementById(targetId);
+                
+                // Alternar la clase active para la descripción
+                descriptionElement.classList.toggle('active');
+                
+                // Alternar la clase active para el botón
+                this.classList.toggle('active');
+            });
+        });
+    });
+</script>
+{% endblock %} 

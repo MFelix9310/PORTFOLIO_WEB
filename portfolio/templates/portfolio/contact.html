@@ -1,0 +1,138 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Contact{% else %}Contacto{% endif %} - Felix Ruiz M.{% endblock %}
+
+{% block content %}
+<!-- Contact Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Contact{% else %}Contacto{% endif %}</h1>
+                <p class="lead" data-aos="fade-up" data-aos-delay="100">{% if LANGUAGE_CODE == 'en' %}Do you have a project in mind? Let's talk about it!{% else %}¿Tienes un proyecto en mente? ¡Hablemos de ello!{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Information -->
+            <div class="col-lg-5 mb-5 mb-lg-0" data-aos="fade-right">
+                <div class="contact-info">
+                    <h3 class="mb-4">{% if LANGUAGE_CODE == 'en' %}Contact Information{% else %}Información de Contacto{% endif %}</h3>
+                    <p class="mb-4">{% if LANGUAGE_CODE == 'en' %}I am available for freelance projects, job opportunities or simply to talk about technology and software development.{% else %}Estoy disponible para proyectos freelance, oportunidades laborales o simplemente para conversar sobre tecnología y desarrollo de software.{% endif %}</p>
+                    
+                    {% for contact in contact_list %}
+                        {% if contact.is_active %}
+                            <div class="contact-info-item">
+                                <div class="contact-info-icon">
+                                    {% if contact.type == 'linkedin' %}
+                                        <i class="fab fa-linkedin"></i>
+                                    {% elif contact.type == 'github' %}
+                                        <i class="fab fa-github"></i>
+                                    {% elif contact.type == 'instagram' %}
+                                        <i class="fab fa-instagram"></i>
+                                    {% elif contact.type == 'tiktok' %}
+                                        <i class="fab fa-tiktok"></i>
+                                    {% elif contact.type == 'phone' %}
+                                        <i class="fas fa-phone"></i>
+                                    {% elif contact.type == 'email' %}
+                                        <i class="fas fa-envelope"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h5>{{ contact.get_type_display }}</h5>
+                                    {% if contact.type == 'linkedin' or contact.type == 'github' or contact.type == 'instagram' or contact.type == 'tiktok' %}
+                                        <a href="{{ contact.value }}" target="_blank">{{ contact.value }}</a>
+                                    {% elif contact.type == 'phone' %}
+                                        <a href="tel:{{ contact.value }}">{{ contact.value }}</a>
+                                    {% elif contact.type == 'email' %}
+                                        <a href="mailto:{{ contact.value }}">{{ contact.value }}</a>
+                                    {% else %}
+                                        <p>{{ contact.value }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <!-- Social Media -->
+                <div class="mt-5">
+                    <h3 class="mb-4">{% if LANGUAGE_CODE == 'en' %}Follow Me{% else %}Sígueme{% endif %}</h3>
+                    <div class="social-icons d-flex">
+                        {% for contact in contact_list %}
+                            {% if contact.type == 'linkedin' and contact.is_active %}
+                                <a href="{{ contact.value }}" class="me-3" target="_blank">
+                                    <div class="contact-info-icon">
+                                        <i class="fab fa-linkedin"></i>
+                                    </div>
+                                </a>
+                            {% endif %}
+                            {% if contact.type == 'github' and contact.is_active %}
+                                <a href="{{ contact.value }}" class="me-3" target="_blank">
+                                    <div class="contact-info-icon">
+                                        <i class="fab fa-github"></i>
+                                    </div>
+                                </a>
+                            {% endif %}
+                            {% if contact.type == 'instagram' and contact.is_active %}
+                                <a href="{{ contact.value }}" class="me-3" target="_blank">
+                                    <div class="contact-info-icon">
+                                        <i class="fab fa-instagram"></i>
+                                    </div>
+                                </a>
+                            {% endif %}
+                            {% if contact.type == 'tiktok' and contact.is_active %}
+                                <a href="{{ contact.value }}" class="me-3" target="_blank">
+                                    <div class="contact-info-icon">
+                                        <i class="fab fa-tiktok"></i>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="col-lg-7" data-aos="fade-left">
+                <div class="contact-form">
+                    <h3 class="mb-4">{% if LANGUAGE_CODE == 'en' %}Send Me a Message{% else %}Envíame un Mensaje{% endif %}</h3>
+                    <form id="contactForm" method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">{% if LANGUAGE_CODE == 'en' %}Name{% else %}Nombre{% endif %}</label>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="{% if LANGUAGE_CODE == 'en' %}Your full name{% else %}Tu nombre completo{% endif %}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="{% if LANGUAGE_CODE == 'en' %}your@email.com{% else %}tu@email.com{% endif %}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">{% if LANGUAGE_CODE == 'en' %}Subject{% else %}Asunto{% endif %}</label>
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="{% if LANGUAGE_CODE == 'en' %}Message subject{% else %}Asunto del mensaje{% endif %}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">{% if LANGUAGE_CODE == 'en' %}Message{% else %}Mensaje{% endif %}</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="{% if LANGUAGE_CODE == 'en' %}Write your message here...{% else %}Escribe tu mensaje aquí...{% endif %}"></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-orange">{% if LANGUAGE_CODE == 'en' %}Send Message{% else %}Enviar Mensaje{% endif %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

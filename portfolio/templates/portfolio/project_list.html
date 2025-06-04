@@ -1,0 +1,350 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Projects{% else %}Proyectos{% endif %} - Felix Ruiz M.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .project-description {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        margin-top: 0;
+        border-top: 1px solid #eee;
+    }
+    
+    .project-description.active {
+        max-height: 500px;
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .project-image-container {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        margin-top: 0;
+    }
+    
+    .project-image-container.active {
+        max-height: 500px;
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .btn-toggle.active {
+        background-color: #e67e22;
+    }
+    
+    .project-card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+        overflow: hidden;
+    }
+    
+    .project-card-header {
+        background-color: #ff7a00;
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .project-card-body {
+        padding: 1.5rem;
+    }
+    
+    .category-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+        color: white;
+    }
+    
+    .category-title {
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .category-title::after {
+        content: '';
+        position: absolute;
+        width: 70px;
+        height: 3px;
+        background-color: #ff7a00;
+        bottom: 0;
+        left: 0;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border-radius: 30px;
+        background-color: #f5f5f5;
+        color: #333;
+        border: 2px solid #eee;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .filter-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .filter-btn.active {
+        background-color: #ff7a00;
+        color: white;
+        border-color: #ff7a00;
+    }
+    
+    .debug-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #333;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        z-index: 1000;
+        cursor: pointer;
+        opacity: 0.7;
+        font-size: 12px;
+        display: none;
+    }
+    
+    .debug-button:hover {
+        opacity: 1;
+    }
+    
+    .debug-info {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px;
+        font-size: 10px;
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Projects Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Projects{% else %}Proyectos{% endif %}</h1>
+                <p class="lead" data-aos="fade-up" data-aos-delay="100">{% if LANGUAGE_CODE == 'en' %}Research and notable developments{% else %}Investigación y desarrollos destacados{% endif %}</p>
+                <div class="mt-4">
+                    <a href="{% url 'portfolio:work_experience_list' %}" class="btn btn-outline-dark">
+                        {% if LANGUAGE_CODE == 'en' %}View Work Experience{% else %}Ver Experiencia Laboral{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects List - React Root Container -->
+<section class="py-5">
+    <div class="container">
+        <div id="react-projects-container">
+            <!-- La versión sin React (fallback) -->
+            {% if project_list %}
+                <div class="filter-buttons" data-aos="fade-up">
+                    <button class="filter-btn active" data-filter="all">
+                        {% if LANGUAGE_CODE == 'en' %}All Projects{% else %}Todos los Proyectos{% endif %}
+                    </button>
+                    <button class="filter-btn" data-filter="data_scientist">
+                        Data Scientist
+                    </button>
+                    <button class="filter-btn" data-filter="data_analyst">
+                        Data Analyst
+                    </button>
+                    <button class="filter-btn" data-filter="python_developer">
+                        Python Developer
+                    </button>
+                </div>
+                
+                <div class="row" id="projects-container">
+                    {% for project in project_list %}
+                        {% if forloop.counter0|divisibleby:3 == 0 %}
+                        <div class="col-md-6 col-lg-4 mb-4 project-item" data-aos="fade-up" data-aos-delay="100" data-skills="{{ project.skills }}">
+                        {% elif forloop.counter0|divisibleby:3 == 1 %}
+                        <div class="col-md-6 col-lg-4 mb-4 project-item" data-aos="fade-up" data-aos-delay="200" data-skills="{{ project.skills }}">
+                        {% elif forloop.counter0|divisibleby:3 == 2 %}
+                        <div class="col-md-6 col-lg-4 mb-4 project-item" data-aos="fade-up" data-aos-delay="300" data-skills="{{ project.skills }}">
+                        {% else %}
+                        <div class="col-md-6 col-lg-4 mb-4 project-item" data-aos="fade-up" data-skills="{{ project.skills }}">
+                        {% endif %}
+                            <div class="project-card h-100">
+                                <div class="project-card-header">
+                                    <h4>
+                                        {% if LANGUAGE_CODE == 'en' and project.title_en %}
+                                            {{ project.title_en }}
+                                        {% else %}
+                                            {{ project.title }}
+                                        {% endif %}
+                                    </h4>
+                                    
+                                    <p class="mb-0">
+                                        {% if LANGUAGE_CODE == 'en' and project.technologies_en %}
+                                            {{ project.technologies_en }}
+                                        {% else %}
+                                            {{ project.technologies }}
+                                        {% endif %}
+                                    </p>
+                                    
+                                    {% if project.skills %}
+                                        <div class="mt-2">
+                                            {% for skill in project.get_skills_list %}
+                                                <span class="category-badge">
+                                                    {% if skill == 'data_scientist' %}
+                                                        Data Scientist
+                                                    {% elif skill == 'data_analyst' %}
+                                                        Data Analyst
+                                                    {% elif skill == 'python_developer' %}
+                                                        Python Developer
+                                                    {% else %}
+                                                        {{ skill }}
+                                                    {% endif %}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="project-card-body">
+                                    <!-- Botones de acción -->
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <button class="btn btn-sm btn-orange btn-toggle description-toggle" data-target="description-{{ project.id }}">
+                                            {% if LANGUAGE_CODE == 'en' %}Description{% else %}Descripción{% endif %}
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-orange btn-toggle image-toggle" data-target="image-{{ project.id }}">
+                                            {% if LANGUAGE_CODE == 'en' %}Image{% else %}Imagen{% endif %}
+                                        </button>
+                                        
+                                        <a href="{% url 'portfolio:project_detail' project.id %}" class="btn btn-sm btn-orange">
+                                            {% if LANGUAGE_CODE == 'en' %}Details{% else %}Detalles{% endif %}
+                                        </a>
+                                        
+                                        {% if project.github_url %}
+                                        <a href="{{ project.github_url }}" target="_blank" class="btn btn-sm btn-orange">
+                                            GitHub
+                                        </a>
+                                        {% endif %}
+                                        
+                                        {% if project.project_url %}
+                                        <a href="{{ project.project_url }}" target="_blank" class="btn btn-sm btn-orange">
+                                            {% if LANGUAGE_CODE == 'en' %}Demo{% else %}Demo{% endif %}
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Contenedor de imagen (oculto por defecto) -->
+                                    <div id="image-{{ project.id }}" class="project-image-container">
+                                        {% if project.thumbnail %}
+                                        <img src="{{ project.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and project.title_en %}{{ project.title_en }}{% else %}{{ project.title }}{% endif %}" class="img-fluid rounded">
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Contenedor de descripción (oculto por defecto) -->
+                                    <div id="description-{{ project.id }}" class="project-description">
+                                        <p>
+                                            {% if LANGUAGE_CODE == 'en' and project.description_en %}
+                                                {{ project.description_en }}
+                                            {% else %}
+                                                {{ project.description }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>{% if LANGUAGE_CODE == 'en' %}No projects available.{% else %}No hay proyectos disponibles.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Cargar los scripts de React solo si están disponibles -->
+{% if REACT_ENABLED %}
+    <script src="{% static 'react/vendors-main.js' %}"></script>
+    <script src="{% static 'react/projectList.js' %}"></script>
+{% else %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Código JS existente para la versión sin React
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const projectItems = document.querySelectorAll('.project-item');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Quitar la clase 'active' de todos los botones
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Añadir la clase 'active' al botón actual
+                    this.classList.add('active');
+                    
+                    // Obtener el filtro seleccionado
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Mostrar u ocultar proyectos según el filtro
+                    projectItems.forEach(item => {
+                        const skills = item.getAttribute('data-skills');
+                        
+                        if (filter === 'all') {
+                            item.style.display = 'block';
+                        } else {
+                            // Verificar si la habilidad está en la lista de habilidades del proyecto
+                            if (skills && skills.includes(filter)) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+            
+            // Gestionar toggles de descripción e imagen
+            const toggleButtons = document.querySelectorAll('.btn-toggle');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    // Toggle clase active
+                    this.classList.toggle('active');
+                    targetElement.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+{% endif %}
+{% endblock %} 

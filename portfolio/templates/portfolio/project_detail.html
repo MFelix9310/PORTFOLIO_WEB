@@ -1,0 +1,300 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}
+    {% if LANGUAGE_CODE == 'en' and project.title_en %}
+        {{ project.title_en }}
+    {% else %}
+        {{ project.title }}
+    {% endif %} - Felix Ruiz M.
+{% endblock %}
+
+{% block extra_css %}
+<!-- GLightbox CSS -->
+<link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+<style>
+    .project-links {
+        margin-top: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .btn-github {
+        background-color: #333;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-github:hover {
+        background-color: #24292e;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .btn-orange {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-orange:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(255,122,0,0.3);
+    }
+    
+    .btn-icon {
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Project Detail Header -->
+<section class="project-detail-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold" data-aos="fade-up">
+                    {% if LANGUAGE_CODE == 'en' and project.title_en %}
+                        {{ project.title_en }}
+                    {% else %}
+                        {{ project.title }}
+                    {% endif %}
+                </h1>
+                <p class="lead text-orange mb-0" data-aos="fade-up" data-aos-delay="100">
+                    {% if LANGUAGE_CODE == 'en' and project.technologies_en %}
+                        {{ project.technologies_en }}
+                    {% else %}
+                        {{ project.technologies }}
+                    {% endif %}
+                </p>
+                
+                <div class="project-links mt-4" data-aos="fade-up" data-aos-delay="200">
+                    {% if project.github_url %}
+                        <a href="{{ project.github_url }}" target="_blank" class="btn btn-github btn-lg px-4">
+                            <i class="fab fa-github btn-icon"></i> GitHub
+                        </a>
+                    {% endif %}
+                    {% if project.project_url %}
+                        <a href="{{ project.project_url }}" target="_blank" class="btn btn-orange btn-lg px-4">
+                            <i class="fas fa-external-link-alt btn-icon"></i> {% if LANGUAGE_CODE == 'en' %}View Demo{% else %}Ver Demo{% endif %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Project Detail Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Featured Image -->
+                <div class="project-detail-img mb-5" data-aos="fade-up">
+                    {% if project.thumbnail %}
+                        <img src="{{ project.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and project.title_en %}{{ project.title_en }}{% else %}{{ project.title }}{% endif %}" class="img-fluid">
+                    {% endif %}
+                </div>
+                
+                <!-- Project Description -->
+                <div class="project-detail-content" data-aos="fade-up">
+                    <h3 class="mb-4">
+                        {% if project.type == 'work' %}
+                            {% if LANGUAGE_CODE == 'en' %}Job Description{% else %}Descripción del Puesto{% endif %}
+                        {% else %}
+                            {% if LANGUAGE_CODE == 'en' %}Project Description{% else %}Descripción del Proyecto{% endif %}
+                        {% endif %}
+                    </h3>
+                    
+                    {% if project.type == 'work' %}
+                        <div class="work-info mb-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>
+                                        {% if LANGUAGE_CODE == 'en' and project.position_en %}
+                                            {{ project.position_en }}
+                                        {% else %}
+                                            {{ project.position }}
+                                        {% endif %}
+                                    </h5>
+                                    <p class="text-muted">
+                                        {% if LANGUAGE_CODE == 'en' and project.company_en %}
+                                            {{ project.company_en }}
+                                        {% else %}
+                                            {{ project.company }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <p class="work-dates">
+                                        {{ project.start_date|date:"F Y" }} - 
+                                        {% if project.current_job %}
+                                            {% if LANGUAGE_CODE == 'en' %}Present{% else %}Actualidad{% endif %}
+                                        {% else %}
+                                            {{ project.end_date|date:"F Y" }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <p>
+                        {% if LANGUAGE_CODE == 'en' and project.description_en %}
+                            {{ project.description_en }}
+                        {% else %}
+                            {{ project.description }}
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <!-- Project Gallery -->
+                {% if project.images.exists or project.videos.exists or project.documents.exists %}
+                    <div class="project-gallery" data-aos="fade-up">
+                        <h3 class="mb-4">{% if LANGUAGE_CODE == 'en' %}Project Gallery{% else %}Galería del Proyecto{% endif %}</h3>
+                        
+                        <!-- Images -->
+                        {% if project.images.exists %}
+                            <div class="row">
+                                {% for image in project.images.all %}
+                                    <div class="col-md-4 mb-4">
+                                        <div class="gallery-item">
+                                            <a href="{{ image.image.url }}" class="glightbox" data-gallery="project-gallery" data-title="{% if LANGUAGE_CODE == 'en' and image.caption_en %}{{ image.caption_en }}{% else %}{{ image.caption }}{% endif %}">
+                                                <img src="{{ image.image.url }}" alt="{% if LANGUAGE_CODE == 'en' and image.caption_en %}{{ image.caption_en }}{% else %}{{ image.caption }}{% endif %}" class="img-fluid">
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Videos -->
+                        {% if project.videos.exists %}
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 class="mb-3">{% if LANGUAGE_CODE == 'en' %}Videos{% else %}Videos{% endif %}</h4>
+                                </div>
+                                {% for video in project.videos.all %}
+                                    <div class="col-md-6 mb-4">
+                                        <div class="gallery-item">
+                                            <video class="project-video img-fluid" controls preload="none" poster="/static/images/video-poster.jpg">
+                                                <source src="{{ video.video.url }}" type="video/mp4">
+                                                {% if LANGUAGE_CODE == 'en' %}Your browser does not support the video tag.{% else %}Tu navegador no soporta la etiqueta de video.{% endif %}
+                                            </video>
+                                            {% if video.caption %}
+                                                <p class="mt-2 text-center">
+                                                    {% if LANGUAGE_CODE == 'en' and video.caption_en %}
+                                                        {{ video.caption_en }}
+                                                    {% else %}
+                                                        {{ video.caption }}
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Documents -->
+                        {% if project.documents.exists %}
+                            <div class="mt-5">
+                                <h4 class="mb-3">{% if LANGUAGE_CODE == 'en' %}Documents{% else %}Documentos{% endif %}</h4>
+                                <div class="list-group">
+                                    {% for document in project.documents.all %}
+                                        <a href="{{ document.document.url }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" target="_blank">
+                                            <div>
+                                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                {% if LANGUAGE_CODE == 'en' and document.title_en %}
+                                                    {{ document.title_en }}
+                                                {% else %}
+                                                    {{ document.title }}
+                                                {% endif %}
+                                            </div>
+                                            <span class="badge bg-orange rounded-pill">
+                                                <i class="fas fa-download"></i>
+                                            </span>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Projects Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="section-title text-center" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Related Projects{% else %}Proyectos Relacionados{% endif %}</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% for related_project in project_list|slice:":3" %}
+                {% if related_project.id != project.id %}
+                    {% if forloop.counter0 == 0 %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    {% elif forloop.counter0 == 1 %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    {% elif forloop.counter0 == 2 %}
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    {% else %}
+                    <div class="col-md-4" data-aos="fade-up">
+                    {% endif %}
+                        <div class="project-card">
+                            <div class="project-card-img">
+                                {% if related_project.thumbnail %}
+                                    <img src="{{ related_project.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and related_project.title_en %}{{ related_project.title_en }}{% else %}{{ related_project.title }}{% endif %}">
+                                {% else %}
+                                    <img src="/static/images/placeholder-project.jpg" alt="Project Placeholder">
+                                {% endif %}
+                                <div class="project-overlay">
+                                    <a href="{% url 'portfolio:project_detail' related_project.id %}" class="btn btn-orange">{% if LANGUAGE_CODE == 'en' %}View Details{% else %}Ver Detalles{% endif %}</a>
+                                </div>
+                            </div>
+                            <div class="project-card-body">
+                                <h5 class="project-card-title">
+                                    {% if LANGUAGE_CODE == 'en' and related_project.title_en %}
+                                        {{ related_project.title_en }}
+                                    {% else %}
+                                        {{ related_project.title }}
+                                    {% endif %}
+                                </h5>
+                                <p class="project-card-tech">
+                                    {% if LANGUAGE_CODE == 'en' and related_project.technologies_en %}
+                                        {{ related_project.technologies_en }}
+                                    {% else %}
+                                        {{ related_project.technologies }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- GLightbox JS -->
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lightbox = GLightbox({
+            touchNavigation: true,
+            loop: true,
+            autoplayVideos: false
+        });
+    });
+</script>
+{% endblock %} 

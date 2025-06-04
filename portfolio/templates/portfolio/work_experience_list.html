@@ -1,0 +1,292 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if LANGUAGE_CODE == 'en' %}Work Experience - Felix Ruiz M.{% else %}Experiencia Laboral - Felix Ruiz M.{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .company-logo {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        padding: 5px;
+    }
+    
+    .work-card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .work-card-header {
+        background-color: #ff7a00;
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .work-card-body {
+        padding: 1.5rem;
+    }
+    
+    .work-company {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .work-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+    
+    .work-company-name {
+        margin-left: 10px;
+        font-weight: 500;
+        color: white;
+    }
+    
+    .work-dates {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .work-dates i {
+        margin-right: 6px;
+    }
+    
+    .work-skill {
+        display: inline-block;
+        background-color: rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border-radius: 30px;
+        background-color: #f5f5f5;
+        color: #333;
+        border: 2px solid #eee;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .filter-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .filter-btn.active {
+        background-color: #ff7a00;
+        color: white;
+        border-color: #ff7a00;
+    }
+    
+    .category-title {
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .category-title::after {
+        content: '';
+        position: absolute;
+        width: 70px;
+        height: 3px;
+        background-color: #ff7a00;
+        bottom: 0;
+        left: 0;
+    }
+    
+    .work-description {
+        margin-top: 1rem;
+        color: #555;
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold" data-aos="fade-up">
+                    {% if LANGUAGE_CODE == 'en' %}Work Experience{% else %}Experiencia Laboral{% endif %}
+                </h1>
+                <p class="lead" data-aos="fade-up" data-aos-delay="100">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        My professional journey and career development
+                    {% else %}
+                        Mi trayectoria profesional y desarrollo de carrera
+                    {% endif %}
+                </p>
+                <div class="mt-4">
+                    <a href="{% url 'portfolio:project_list' %}" class="btn btn-outline-dark">
+                        {% if LANGUAGE_CODE == 'en' %}View Projects{% else %}Ver Proyectos{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Experience List Section -->
+<section class="py-5">
+    <div class="container">
+        {% if work_list %}
+            {% if work_list.count > 1 %}
+                <div class="filter-buttons" data-aos="fade-up">
+                    <button class="filter-btn active" data-filter="all">
+                        {% if LANGUAGE_CODE == 'en' %}All{% else %}Todos{% endif %}
+                    </button>
+                    <button class="filter-btn" data-filter="data_scientist">Data Scientist</button>
+                    <button class="filter-btn" data-filter="data_analyst">Data Analyst</button>
+                    <button class="filter-btn" data-filter="python_developer">Python Developer</button>
+                </div>
+            {% endif %}
+            
+            <div class="row">
+                {% for work in work_list %}
+                    {% with skills=work.get_skills_list %}
+                    <div class="col-md-6 mb-4 work-item {% for skill in skills %}skill-{{ skill|slugify }} {% endfor %}" data-aos="fade-up" data-aos-delay="{{ forloop.counter|divisibleby:2|yesno:'200,100' }}">
+                        <div class="work-card h-100">
+                            <div class="work-card-header">
+                                <div class="work-company">
+                                    {% if work.company_logo %}
+                                        <img src="{{ work.company_logo.url }}" alt="{{ work.company }}" class="company-logo">
+                                    {% endif %}
+                                    <h4 class="work-company-name">
+                                        {% if LANGUAGE_CODE == 'en' and work.company_en %}
+                                            {{ work.company_en }}
+                                        {% else %}
+                                            {{ work.company }}
+                                        {% endif %}
+                                    </h4>
+                                </div>
+                                
+                                <h5 class="work-title">
+                                    {% if LANGUAGE_CODE == 'en' and work.position_en %}
+                                        {{ work.position_en }}
+                                    {% else %}
+                                        {{ work.position }}
+                                    {% endif %}
+                                </h5>
+                                
+                                <p class="work-dates">
+                                    <i class="far fa-calendar-alt"></i>
+                                    {{ work.start_date|date:"F Y" }} - 
+                                    {% if work.current_job %}
+                                        {% if LANGUAGE_CODE == 'en' %}Present{% else %}Actualidad{% endif %}
+                                    {% else %}
+                                        {{ work.end_date|date:"F Y" }}
+                                    {% endif %}
+                                </p>
+                                
+                                {% if work.skills %}
+                                    <div class="mt-2">
+                                        {% for skill in work.get_skills_list %}
+                                            <span class="work-skill">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="work-card-body">
+                                <div class="work-description">
+                                    {% if LANGUAGE_CODE == 'en' and work.description_en %}
+                                        {{ work.description_en|linebreaks|truncatechars:150 }}
+                                    {% else %}
+                                        {{ work.description|linebreaks|truncatechars:150 }}
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <a href="{% url 'portfolio:work_experience_detail' work.id %}" class="btn btn-sm btn-orange">
+                                        {% if LANGUAGE_CODE == 'en' %}View Details{% else %}Ver Detalles{% endif %}
+                                        <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                {% if LANGUAGE_CODE == 'en' %}
+                    No work experience available at the moment.
+                {% else %}
+                    No hay experiencia laboral disponible en este momento.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filtrado por habilidades
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Actualizar botones activos
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filtrar elementos
+                const workItems = document.querySelectorAll('.work-item');
+                
+                if (filter === 'all') {
+                    workItems.forEach(item => {
+                        item.style.display = 'block';
+                    });
+                } else {
+                    workItems.forEach(item => {
+                        if (item.classList.contains('skill-' + filter)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

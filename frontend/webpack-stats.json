@@ -1,0 +1,39 @@
+{
+  "status": "done",
+  "assets": {
+    "main-f949180f5cf7206a795c.js": {
+      "name": "main-f949180f5cf7206a795c.js",
+      "path": "C:\\Users\\FELIX\\Desktop\\PROYECTOS ML\\PORTFOLIO_WEB\\portfolio\\static\\react\\main-f949180f5cf7206a795c.js",
+      "publicPath": "/static/react/main-f949180f5cf7206a795c.js"
+    },
+    "projectList-f949180f5cf7206a795c.js": {
+      "name": "projectList-f949180f5cf7206a795c.js",
+      "path": "C:\\Users\\FELIX\\Desktop\\PROYECTOS ML\\PORTFOLIO_WEB\\portfolio\\static\\react\\projectList-f949180f5cf7206a795c.js",
+      "publicPath": "/static/react/projectList-f949180f5cf7206a795c.js"
+    },
+    "vendors-f949180f5cf7206a795c.js": {
+      "name": "vendors-f949180f5cf7206a795c.js",
+      "path": "C:\\Users\\FELIX\\Desktop\\PROYECTOS ML\\PORTFOLIO_WEB\\portfolio\\static\\react\\vendors-f949180f5cf7206a795c.js",
+      "publicPath": "/static/react/vendors-f949180f5cf7206a795c.js"
+    },
+    "workExperienceList-f949180f5cf7206a795c.js": {
+      "name": "workExperienceList-f949180f5cf7206a795c.js",
+      "path": "C:\\Users\\FELIX\\Desktop\\PROYECTOS ML\\PORTFOLIO_WEB\\portfolio\\static\\react\\workExperienceList-f949180f5cf7206a795c.js",
+      "publicPath": "/static/react/workExperienceList-f949180f5cf7206a795c.js"
+    }
+  },
+  "chunks": {
+    "main": [
+      "main-f949180f5cf7206a795c.js"
+    ],
+    "projectList": [
+      "vendors-f949180f5cf7206a795c.js",
+      "projectList-f949180f5cf7206a795c.js"
+    ],
+    "workExperienceList": [
+      "vendors-f949180f5cf7206a795c.js",
+      "workExperienceList-f949180f5cf7206a795c.js"
+    ]
+  },
+  "publicPath": "/static/react/"
+}

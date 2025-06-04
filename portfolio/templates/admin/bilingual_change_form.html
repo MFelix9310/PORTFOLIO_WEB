@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+    {% if original and original.pk %}
+    <div class="submit-row">
+        <h3 style="margin-top: 20px;">Herramientas de idioma</h3>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <a href="{% url opts|admin_urlname:'copy_es_to_en' original.pk %}" class="button" 
+               style="background-color: #417690; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">
+                Copiar Español → Inglés
+            </a>
+            <a href="{% url opts|admin_urlname:'copy_en_to_es' original.pk %}" class="button"
+               style="background-color: #79aec8; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">
+                Copiar Inglés → Español
+            </a>
+        </div>
+        <p style="margin-top: 10px; font-size: 13px; color: #666;">
+            Estas herramientas te permiten copiar el contenido de un idioma a otro con un solo clic. 
+            Asegúrate de guardar después de copiar.
+        </p>
+    </div>
+    {% endif %}
+{% endblock %} 

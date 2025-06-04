@@ -1,0 +1,734 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Publications{% else %}Publicaciones{% endif %} - Felix Ruiz M.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .publication-description {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        margin-top: 0;
+        border-top: 1px solid #eee;
+    }
+    
+    .publication-description.active {
+        max-height: 500px; /* Altura máxima arbitraria para la animación */
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .publication-image-container {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        margin-top: 0;
+    }
+    
+    .publication-image-container.active {
+        max-height: 500px; /* Altura máxima arbitraria para la animación */
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+    
+    .btn-toggle.active {
+        background-color: #e67e22;
+    }
+    
+    .publication-card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        background-color: #fff;
+        overflow: hidden;
+    }
+    
+    .publication-card-header {
+        background-color: #ff7a00;
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .publication-card-body {
+        padding: 1.5rem;
+    }
+    
+    .publication-date {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    
+    .publication-type-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+        color: white;
+    }
+    
+    .category-title {
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .category-title::after {
+        content: '';
+        position: absolute;
+        width: 70px;
+        height: 3px;
+        background-color: #ff7a00;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Publications Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Publications{% else %}Publicaciones{% endif %}</h1>
+                <p class="lead" data-aos="fade-up" data-aos-delay="100">{% if LANGUAGE_CODE == 'en' %}Books, scientific articles and academic research{% else %}Libros, artículos científicos e investigación académica{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Publications List By Categories -->
+<section class="py-4">
+    <div class="container">
+        {% if publication_list %}
+            <!-- Books Section -->
+            {% with book_publications=publication_list|dictsortreversed:"publication_date" %}
+                {% with has_books=False %}
+                    {% for publication in book_publications %}
+                        {% if publication.type == 'book' and not has_books %}
+                            {% with has_books=True %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h2 class="category-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Books{% else %}Libros{% endif %}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            {% endwith %}
+                        {% endif %}
+                        
+                        {% if publication.type == 'book' %}
+                            {% if forloop.counter0|divisibleby:3 == 0 %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                            {% elif forloop.counter0|divisibleby:3 == 1 %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                            {% elif forloop.counter0|divisibleby:3 == 2 %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                            {% else %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
+                            {% endif %}
+                                <div class="publication-card h-100">
+                                    <div class="publication-card-header">
+                                        <h4>
+                                            {% if LANGUAGE_CODE == 'en' and publication.title_en %}
+                                                {{ publication.title_en }}
+                                            {% else %}
+                                                {{ publication.title }}
+                                            {% endif %}
+                                        </h4>
+                                        
+                                        <p class="mb-0">
+                                            {% if LANGUAGE_CODE == 'en' and publication.authors_en %}
+                                                {{ publication.authors_en }}
+                                            {% else %}
+                                                {{ publication.authors }}
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <p class="mb-0">
+                                            <em>
+                                                {% if LANGUAGE_CODE == 'en' and publication.journal_or_publisher_en %}
+                                                    {{ publication.journal_or_publisher_en }}
+                                                {% else %}
+                                                    {{ publication.journal_or_publisher }}
+                                                {% endif %}
+                                            </em>
+                                        </p>
+                                        
+                                        <span class="publication-date">{{ publication.publication_date|date:"Y" }}</span>
+                                    </div>
+                                    
+                                    <div class="publication-card-body">
+                                        <!-- Botones de acción -->
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <button class="btn btn-sm btn-orange btn-toggle description-toggle" data-target="description-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Abstract{% else %}Resumen{% endif %}
+                                            </button>
+                                            
+                                            {% if publication.thumbnail %}
+                                            <button class="btn btn-sm btn-orange btn-toggle image-toggle" data-target="image-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Image{% else %}Imagen{% endif %}
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if publication.doi %}
+                                            <a href="https://doi.org/{{ publication.doi }}" class="btn btn-sm btn-orange" target="_blank">
+                                                DOI
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.url %}
+                                            <a href="{{ publication.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                {% if LANGUAGE_CODE == 'en' %}Link{% else %}Enlace{% endif %}
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.pdf_file %}
+                                            <a href="{{ publication.pdf_file.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                PDF
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Contenedor de imagen (oculto por defecto) -->
+                                        <div id="image-{{ publication.id }}" class="publication-image-container">
+                                            {% if publication.thumbnail %}
+                                            <img src="{{ publication.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and publication.title_en %}{{ publication.title_en }}{% else %}{{ publication.title }}{% endif %}" class="img-fluid rounded">
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Contenedor de resumen (oculto por defecto) -->
+                                        <div id="description-{{ publication.id }}" class="publication-description">
+                                            <p>
+                                                {% if LANGUAGE_CODE == 'en' and publication.abstract_en %}
+                                                    {{ publication.abstract_en }}
+                                                {% else %}
+                                                    {{ publication.abstract }}
+                                                {% endif %}
+                                            </p>
+                                            
+                                            {% if publication.isbn %}
+                                            <p class="mt-2 small text-muted">
+                                                ISBN: {{ publication.isbn }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if has_books %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+            
+            <!-- Articles Section -->
+            {% with article_publications=publication_list|dictsortreversed:"publication_date" %}
+                {% with has_articles=False %}
+                    {% for publication in article_publications %}
+                        {% if publication.type == 'article' and not has_articles %}
+                            {% with has_articles=True %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h2 class="category-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Articles{% else %}Artículos{% endif %}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            {% endwith %}
+                        {% endif %}
+                        
+                        {% if publication.type == 'article' %}
+                            {% if forloop.counter0|divisibleby:3 == 0 %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                            {% elif forloop.counter0|divisibleby:3 == 1 %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                            {% elif forloop.counter0|divisibleby:3 == 2 %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                            {% else %}
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
+                            {% endif %}
+                                <div class="publication-card h-100">
+                                    <div class="publication-card-header">
+                                        <h4>
+                                            {% if LANGUAGE_CODE == 'en' and publication.title_en %}
+                                                {{ publication.title_en }}
+                                            {% else %}
+                                                {{ publication.title }}
+                                            {% endif %}
+                                        </h4>
+                                        
+                                        <p class="mb-0">
+                                            {% if LANGUAGE_CODE == 'en' and publication.authors_en %}
+                                                {{ publication.authors_en }}
+                                            {% else %}
+                                                {{ publication.authors }}
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <p class="mb-0">
+                                            <em>
+                                                {% if LANGUAGE_CODE == 'en' and publication.journal_or_publisher_en %}
+                                                    {{ publication.journal_or_publisher_en }}
+                                                {% else %}
+                                                    {{ publication.journal_or_publisher }}
+                                                {% endif %}
+                                            </em>
+                                        </p>
+                                        
+                                        <span class="publication-date">{{ publication.publication_date|date:"Y" }}</span>
+                                    </div>
+                                    
+                                    <div class="publication-card-body">
+                                        <!-- Botones de acción -->
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <button class="btn btn-sm btn-orange btn-toggle description-toggle" data-target="description-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Abstract{% else %}Resumen{% endif %}
+                                            </button>
+                                            
+                                            {% if publication.thumbnail %}
+                                            <button class="btn btn-sm btn-orange btn-toggle image-toggle" data-target="image-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Image{% else %}Imagen{% endif %}
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if publication.doi %}
+                                            <a href="https://doi.org/{{ publication.doi }}" class="btn btn-sm btn-orange" target="_blank">
+                                                DOI
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.url %}
+                                            <a href="{{ publication.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                {% if LANGUAGE_CODE == 'en' %}Link{% else %}Enlace{% endif %}
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.pdf_file %}
+                                            <a href="{{ publication.pdf_file.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                PDF
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Contenedor de imagen (oculto por defecto) -->
+                                        <div id="image-{{ publication.id }}" class="publication-image-container">
+                                            {% if publication.thumbnail %}
+                                            <img src="{{ publication.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and publication.title_en %}{{ publication.title_en }}{% else %}{{ publication.title }}{% endif %}" class="img-fluid rounded">
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Contenedor de resumen (oculto por defecto) -->
+                                        <div id="description-{{ publication.id }}" class="publication-description">
+                                            <p>
+                                                {% if LANGUAGE_CODE == 'en' and publication.abstract_en %}
+                                                    {{ publication.abstract_en }}
+                                                {% else %}
+                                                    {{ publication.abstract }}
+                                                {% endif %}
+                                            </p>
+                                            
+                                            {% if publication.isbn %}
+                                            <p class="mt-2 small text-muted">
+                                                ISBN: {{ publication.isbn }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if has_articles %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+            
+            <!-- Conferences Section -->
+            {% with conference_publications=publication_list|dictsortreversed:"publication_date" %}
+                {% with has_conferences=False %}
+                    {% for publication in conference_publications %}
+                        {% if publication.type == 'conference' and not has_conferences %}
+                            {% with has_conferences=True %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h2 class="category-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Conferences{% else %}Conferencias{% endif %}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            {% endwith %}
+                        {% endif %}
+                        
+                        {% if publication.type == 'conference' %}
+                            <!-- Contenido de conferencias (similar a las anteriores) -->
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
+                                <!-- Contenido de tarjeta similar -->
+                                <div class="publication-card h-100">
+                                    <!-- Similar a las otras tarjetas -->
+                                    <div class="publication-card-header">
+                                        <h4>
+                                            {% if LANGUAGE_CODE == 'en' and publication.title_en %}
+                                                {{ publication.title_en }}
+                                            {% else %}
+                                                {{ publication.title }}
+                                            {% endif %}
+                                        </h4>
+                                        
+                                        <p class="mb-0">
+                                            {% if LANGUAGE_CODE == 'en' and publication.authors_en %}
+                                                {{ publication.authors_en }}
+                                            {% else %}
+                                                {{ publication.authors }}
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <p class="mb-0">
+                                            <em>
+                                                {% if LANGUAGE_CODE == 'en' and publication.journal_or_publisher_en %}
+                                                    {{ publication.journal_or_publisher_en }}
+                                                {% else %}
+                                                    {{ publication.journal_or_publisher }}
+                                                {% endif %}
+                                            </em>
+                                        </p>
+                                        
+                                        <span class="publication-date">{{ publication.publication_date|date:"Y" }}</span>
+                                    </div>
+                                    
+                                    <div class="publication-card-body">
+                                        <!-- Botones igual que en otras secciones -->
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <button class="btn btn-sm btn-orange btn-toggle description-toggle" data-target="description-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Abstract{% else %}Resumen{% endif %}
+                                            </button>
+                                            
+                                            {% if publication.thumbnail %}
+                                            <button class="btn btn-sm btn-orange btn-toggle image-toggle" data-target="image-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Image{% else %}Imagen{% endif %}
+                                            </button>
+                                            {% endif %}
+                                            
+                                            <!-- Otros botones igual que antes -->
+                                            {% if publication.doi %}
+                                            <a href="https://doi.org/{{ publication.doi }}" class="btn btn-sm btn-orange" target="_blank">
+                                                DOI
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.url %}
+                                            <a href="{{ publication.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                {% if LANGUAGE_CODE == 'en' %}Link{% else %}Enlace{% endif %}
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.pdf_file %}
+                                            <a href="{{ publication.pdf_file.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                PDF
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div id="image-{{ publication.id }}" class="publication-image-container">
+                                            {% if publication.thumbnail %}
+                                            <img src="{{ publication.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and publication.title_en %}{{ publication.title_en }}{% else %}{{ publication.title }}{% endif %}" class="img-fluid rounded">
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div id="description-{{ publication.id }}" class="publication-description">
+                                            <p>
+                                                {% if LANGUAGE_CODE == 'en' and publication.abstract_en %}
+                                                    {{ publication.abstract_en }}
+                                                {% else %}
+                                                    {{ publication.abstract }}
+                                                {% endif %}
+                                            </p>
+                                            
+                                            {% if publication.isbn %}
+                                            <p class="mt-2 small text-muted">
+                                                ISBN: {{ publication.isbn }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if has_conferences %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+            
+            <!-- Thesis Section -->
+            {% with thesis_publications=publication_list|dictsortreversed:"publication_date" %}
+                {% with has_thesis=False %}
+                    {% for publication in thesis_publications %}
+                        {% if publication.type == 'thesis' and not has_thesis %}
+                            {% with has_thesis=True %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h2 class="category-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Thesis{% else %}Tesis{% endif %}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            {% endwith %}
+                        {% endif %}
+                        
+                        {% if publication.type == 'thesis' %}
+                            <!-- Similar structure a las secciones anteriores -->
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
+                                <div class="publication-card h-100">
+                                    <!-- Similar structure for the header and body -->
+                                    <div class="publication-card-header">
+                                        <h4>
+                                            {% if LANGUAGE_CODE == 'en' and publication.title_en %}
+                                                {{ publication.title_en }}
+                                            {% else %}
+                                                {{ publication.title }}
+                                            {% endif %}
+                                        </h4>
+                                        
+                                        <p class="mb-0">
+                                            {% if LANGUAGE_CODE == 'en' and publication.authors_en %}
+                                                {{ publication.authors_en }}
+                                            {% else %}
+                                                {{ publication.authors }}
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <p class="mb-0">
+                                            <em>
+                                                {% if LANGUAGE_CODE == 'en' and publication.journal_or_publisher_en %}
+                                                    {{ publication.journal_or_publisher_en }}
+                                                {% else %}
+                                                    {{ publication.journal_or_publisher }}
+                                                {% endif %}
+                                            </em>
+                                        </p>
+                                        
+                                        <span class="publication-date">{{ publication.publication_date|date:"Y" }}</span>
+                                    </div>
+                                    
+                                    <div class="publication-card-body">
+                                        <!-- Similar buttons and containers -->
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <button class="btn btn-sm btn-orange btn-toggle description-toggle" data-target="description-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Abstract{% else %}Resumen{% endif %}
+                                            </button>
+                                            
+                                            {% if publication.thumbnail %}
+                                            <button class="btn btn-sm btn-orange btn-toggle image-toggle" data-target="image-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Image{% else %}Imagen{% endif %}
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if publication.doi %}
+                                            <a href="https://doi.org/{{ publication.doi }}" class="btn btn-sm btn-orange" target="_blank">
+                                                DOI
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.url %}
+                                            <a href="{{ publication.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                {% if LANGUAGE_CODE == 'en' %}Link{% else %}Enlace{% endif %}
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.pdf_file %}
+                                            <a href="{{ publication.pdf_file.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                PDF
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div id="image-{{ publication.id }}" class="publication-image-container">
+                                            {% if publication.thumbnail %}
+                                            <img src="{{ publication.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and publication.title_en %}{{ publication.title_en }}{% else %}{{ publication.title }}{% endif %}" class="img-fluid rounded">
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div id="description-{{ publication.id }}" class="publication-description">
+                                            <p>
+                                                {% if LANGUAGE_CODE == 'en' and publication.abstract_en %}
+                                                    {{ publication.abstract_en }}
+                                                {% else %}
+                                                    {{ publication.abstract }}
+                                                {% endif %}
+                                            </p>
+                                            
+                                            {% if publication.isbn %}
+                                            <p class="mt-2 small text-muted">
+                                                ISBN: {{ publication.isbn }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if has_thesis %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+            
+            <!-- Other Publications Section (if needed) -->
+            {% with other_publications=publication_list|dictsortreversed:"publication_date" %}
+                {% with has_others=False %}
+                    {% for publication in other_publications %}
+                        {% if publication.type == 'other' and not has_others %}
+                            {% with has_others=True %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h2 class="category-title" data-aos="fade-up">{% if LANGUAGE_CODE == 'en' %}Other Publications{% else %}Otras Publicaciones{% endif %}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            {% endwith %}
+                        {% endif %}
+                        
+                        {% if publication.type == 'other' %}
+                            <!-- Similar structure for other types of publications -->
+                            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
+                                <div class="publication-card h-100">
+                                    <!-- Similar structure for the other publications -->
+                                    <div class="publication-card-header">
+                                        <h4>
+                                            {% if LANGUAGE_CODE == 'en' and publication.title_en %}
+                                                {{ publication.title_en }}
+                                            {% else %}
+                                                {{ publication.title }}
+                                            {% endif %}
+                                        </h4>
+                                        
+                                        <p class="mb-0">
+                                            {% if LANGUAGE_CODE == 'en' and publication.authors_en %}
+                                                {{ publication.authors_en }}
+                                            {% else %}
+                                                {{ publication.authors }}
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <p class="mb-0">
+                                            <em>
+                                                {% if LANGUAGE_CODE == 'en' and publication.journal_or_publisher_en %}
+                                                    {{ publication.journal_or_publisher_en }}
+                                                {% else %}
+                                                    {{ publication.journal_or_publisher }}
+                                                {% endif %}
+                                            </em>
+                                        </p>
+                                        
+                                        <span class="publication-date">{{ publication.publication_date|date:"Y" }}</span>
+                                    </div>
+                                    
+                                    <div class="publication-card-body">
+                                        <!-- Similar buttons and content -->
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <button class="btn btn-sm btn-orange btn-toggle description-toggle" data-target="description-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Abstract{% else %}Resumen{% endif %}
+                                            </button>
+                                            
+                                            {% if publication.thumbnail %}
+                                            <button class="btn btn-sm btn-orange btn-toggle image-toggle" data-target="image-{{ publication.id }}">
+                                                {% if LANGUAGE_CODE == 'en' %}Image{% else %}Imagen{% endif %}
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if publication.doi %}
+                                            <a href="https://doi.org/{{ publication.doi }}" class="btn btn-sm btn-orange" target="_blank">
+                                                DOI
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.url %}
+                                            <a href="{{ publication.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                {% if LANGUAGE_CODE == 'en' %}Link{% else %}Enlace{% endif %}
+                                            </a>
+                                            {% endif %}
+                                            
+                                            {% if publication.pdf_file %}
+                                            <a href="{{ publication.pdf_file.url }}" class="btn btn-sm btn-orange" target="_blank">
+                                                PDF
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div id="image-{{ publication.id }}" class="publication-image-container">
+                                            {% if publication.thumbnail %}
+                                            <img src="{{ publication.thumbnail.url }}" alt="{% if LANGUAGE_CODE == 'en' and publication.title_en %}{{ publication.title_en }}{% else %}{{ publication.title }}{% endif %}" class="img-fluid rounded">
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div id="description-{{ publication.id }}" class="publication-description">
+                                            <p>
+                                                {% if LANGUAGE_CODE == 'en' and publication.abstract_en %}
+                                                    {{ publication.abstract_en }}
+                                                {% else %}
+                                                    {{ publication.abstract }}
+                                                {% endif %}
+                                            </p>
+                                            
+                                            {% if publication.isbn %}
+                                            <p class="mt-2 small text-muted">
+                                                ISBN: {{ publication.isbn }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if has_others %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+        {% else %}
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p>{% if LANGUAGE_CODE == 'en' %}No publications available.{% else %}No hay publicaciones disponibles.{% endif %}</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Solo dejamos el código para los botones de mostrar/ocultar
+        const toggleButtons = document.querySelectorAll('.btn-toggle');
+        
+        toggleButtons.forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const targetElement = document.getElementById(targetId);
+                
+                // Alternar la clase active para el elemento objetivo
+                targetElement.classList.toggle('active');
+                
+                // Alternar la clase active para el botón
+                this.classList.toggle('active');
+            });
+        });
+    });
+</script>
+{% endblock %} 

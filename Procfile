@@ -1,0 +1,1 @@
+web: gunicorn portfolio_web.wsgi --log-file - --log-level debug --bind 0.0.0.0:${PORT} 

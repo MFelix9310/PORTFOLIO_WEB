@@ -1,0 +1,33 @@
+.project-item-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.project-item-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.project-item-exit {
+  opacity: 1;
+}
+
+.project-item-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.filter-btn:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.text-orange {
+  color: #ff7a00;
+}
+
+.spinner-border.text-orange {
+  color: #ff7a00;
+} 
